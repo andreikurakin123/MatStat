@@ -2,7 +2,6 @@ import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-# Фиксируем seed для воспроизводимости
 np.random.seed(42)
 
 # Настройки для графиков
@@ -11,7 +10,6 @@ x_cont = np.linspace(-4, 4, 1000)
 x_disc = np.arange(6, 15)
 x_disc_cont = np.linspace(6, 14, 1000)
 
-# Словари с распределениями (названия и объекты scipy)
 distributions = {
     'Нормальное N(0,1)': stats.norm(loc=0, scale=1),
     'Коши C(0,1)': stats.cauchy(loc=0, scale=1),
@@ -20,7 +18,6 @@ distributions = {
     'Равномерное U(-sqrt(3), sqrt(3))': stats.uniform(loc=-np.sqrt(3), scale=2*np.sqrt(3))
 }
 
-# Функция для построения и сохранения графиков
 def plot_distribution(name, dist, idx):
     is_discrete = 'Пуассона' in name
     
@@ -28,17 +25,17 @@ def plot_distribution(name, dist, idx):
     fig.suptitle(f'Распределение: {name}', fontsize=16)
     
     for i, n in enumerate(sample_sizes):
-        # Генерация выборки
+
         data = dist.rvs(size=n)
         data_sorted = np.sort(data)
         y_ecdf = np.arange(1, n + 1) / n
         
-        # --- Верхний ряд: ЭФР ---
+        # Верхний ряд: ЭФР 
         ax_ecdf = axes[0, i]
         ax_ecdf.set_title(f'ЭФР (n={n})')
         
         if is_discrete:
-            # Для дискретного теоретическая функция - тоже ступеньки
+
             ax_ecdf.step(data_sorted, y_ecdf, where='post', label=f'ЭФР (n={n})', color='blue')
             ax_ecdf.step(x_disc, dist.cdf(x_disc), where='post', label='Теор. ФР', color='red', linestyle='--')
             ax_ecdf.set_xlim(6, 14)
@@ -51,11 +48,10 @@ def plot_distribution(name, dist, idx):
         ax_ecdf.grid(True, alpha=0.3)
         ax_ecdf.legend(fontsize=8)
         
-        # --- Нижний ряд: Плотности и гистограммы ---
         ax_dens = axes[1, i]
         ax_dens.set_title(f'Оценка плотности (n={n})')
         
-        # Ядерная оценка плотности (KDE)
+        # Ядерная оценка плотности
         try:
             kde = stats.gaussian_kde(data)
             x_vals = x_disc_cont if is_discrete else x_cont
